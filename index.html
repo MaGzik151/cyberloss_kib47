@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="CyberLoss - локальный учебный калькулятор финансовых последствий киберпростоя малого интернет-магазина, KIB-47.">
+  <title>CyberLoss | KIB-47 - Калькулятор киберпростоя</title>
+  <style>
+    :root { --bg:#0a0f1e; --panel:#131c2e; --panel2:#182238; --line:#2a3850; --ink:#eff5ff; --muted:#9cafc8; --teal:#72e3c0; --blue:#8fbcff; --orange:#ffbd74; --red:#ff9d9d; --shadow:0 22px 60px rgba(0,0,0,.21); }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; font-family:Inter,"Segoe UI",Arial,sans-serif; color:var(--ink); background: radial-gradient(ellipse at 83% 0%,#1b2b45 0%,transparent 39%),radial-gradient(ellipse at 6% 44%,#102e36 0%,transparent 33%),var(--bg); min-height:100vh; line-height:1.5; }
+    button,input { font:inherit; }
+    button { cursor:pointer; }
+    .shell { width:min(1230px,calc(100% - 40px)); margin:auto; }
+    .topbar { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:26px 0 20px; border-bottom:1px solid rgba(255,255,255,.1); }
+    .brand { display:flex; align-items:center; gap:12px; font-size:22px; font-weight:800; letter-spacing:-.7px; }
+    .brand-mark { width:42px; height:42px; display:grid; place-items:center; border-radius:13px; background:linear-gradient(140deg,#57d1c3,#658bf0); color:#071326; font-size:24px; font-weight:900; }
+    .head-tags { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+    .tag { border:1px solid #35506b; border-radius:100px; padding:6px 12px; font-size:12px; font-weight:700; color:#b6cfdf; background:rgba(255,255,255,.03); }
+    .tag.green { color:var(--teal); border-color:#275e58; background:#173432; }
+    .intro { padding:39px 0 30px; max-width:900px; }
+    .eyebrow { color:var(--teal); text-transform:uppercase; font-size:12px; font-weight:800; letter-spacing:1.8px; }
+    h1 { font-size:clamp(30px,4.6vw,53px); letter-spacing:-1.8px; line-height:1.11; margin:13px 0 13px; }
+    .intro p { font-size:16px; color:var(--muted); max-width:780px; margin:0; }
+    .layout { display:grid; grid-template-columns:minmax(330px,.88fr) minmax(400px,1.12fr); gap:20px; align-items:start; }
+    .panel { border-radius:22px; background:rgba(19,28,46,.94); border:1px solid var(--line); box-shadow:var(--shadow); overflow:hidden; }
+    .phead { padding:24px 25px 16px; display:flex; align-items:start; justify-content:space-between; gap:10px; }
+    .phead h2 { margin:0 0 4px; font-size:20px; letter-spacing:-.4px; }
+    .phead p { margin:0; font-size:13px; color:var(--muted); }
+    .form-content { padding:4px 25px 26px; }
+    .fgroup { border-top:1px solid var(--line); padding-top:18px; margin-top:18px; }
+    .fgroup h3 { color:#c6d7ec; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:1.4px; margin:0 0 14px; }
+    .field-grid { display:grid; grid-template-columns:1fr 1fr; gap:13px; }
+    .field { min-width:0; }
+    .field.span { grid-column:1/-1; }
+    .field label { color:#d8e5f4; display:block; font-size:12px; font-weight:700; margin-bottom:7px; }
+    .inputwrap { position:relative; }
+    .field input { width:100%; border:1px solid #35455c; color:var(--ink); background:#0f1728; border-radius:11px; padding:12px 45px 12px 13px; height:45px; outline:none; transition:border .16s,box-shadow .16s; font-variant-numeric:tabular-nums; }
+    .field input:focus { border-color:var(--teal); box-shadow:0 0 0 3px rgba(114,227,192,.13); }
+    .field input[aria-invalid="true"] { border-color:var(--red); }
+    .suffix { position:absolute; top:11px; right:13px; font-size:13px; color:#8fa4bf; pointer-events:none; }
+    .helper { color:var(--muted); font-size:11px; line-height:1.4; margin:6px 0 0; }
+    .alert { display:none; color:var(--red); background:#321b24; border:1px solid #784351; border-radius:9px; padding:10px 12px; font-size:12px; margin-top:16px; }
+    .btn { border:1px solid #3b5067; border-radius:10px; padding:11px 15px; background:#1a2a40; color:var(--ink); font-weight:750; font-size:13px; }
+    .btn:hover { filter:brightness(1.12); }
+    .btn:focus-visible { outline:3px solid var(--teal); outline-offset:3px; }
+    .btn.primary { background:var(--teal); border-color:var(--teal); color:#08261f; }
+    .btn.ghost { color:#a9c3da; background:transparent; font-weight:700; }
+    .main-actions { display:flex; gap:9px; flex-wrap:wrap; margin-top:19px; }
+    .main-actions .primary { flex:1; }
+    .results { padding:24px 26px 23px; }
+    .results .summary-top { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .results .section-label { color:#afc4dc; text-transform:uppercase; font-size:11px; letter-spacing:1.4px; font-weight:800; }
+    .status { color:var(--teal); font-weight:800; background:#173a35; font-size:11px; border-radius:99px; padding:6px 9px; }
+    .big-number { letter-spacing:-2px; font-size:clamp(39px,5vw,62px); line-height:1.2; font-weight:850; margin-top:15px; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+    .big-caption { color:var(--muted); font-size:13px; margin:4px 0 24px; }
+    .metrics { display:grid; grid-template-columns:1fr 1fr; gap:11px; }
+    .metric { border:1px solid #334459; padding:17px; background:#19263a; border-radius:13px; min-width:0; }
+    .metric small { color:#adc2d8; display:block; font-size:12px; line-height:1.45; }
+    .metric strong { font-size:23px; letter-spacing:-.6px; font-variant-numeric:tabular-nums; display:block; margin-top:6px; overflow-wrap:anywhere; }
+    .metric .num-teal { color:var(--teal); }
+    .metric .num-orange { color:var(--orange); }
+    .subsection { padding:22px 0 0; margin-top:22px; border-top:1px solid var(--line); }
+    .subsection h3 { font-size:16px; margin:0 0 2px; }
+    .subsection p { color:var(--muted); font-size:12px; margin:0; }
+    .bar-row { display:grid; grid-template-columns:53px 1fr 102px; align-items:center; gap:13px; margin-top:18px; }
+    .bar-label,.bar-val { font-size:12px; font-weight:750; font-variant-numeric:tabular-nums; }
+    .bar-val { text-align:right; color:#d5e6f5; }
+    .bar-track { height:13px; background:#26364b; border-radius:999px; overflow:hidden; }
+    .bar-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,#648bf2,#83dbd0); width:0; transition:width .2s ease; min-width:0; }
+    .takeaway { margin-top:23px; background:#112f30; border:1px solid #235956; border-radius:13px; padding:14px 16px; }
+    .takeaway h3 { margin:0 0 6px; font-size:13px; color:var(--teal); }
+    .takeaway p { color:#d0e4e4; font-size:12px; line-height:1.55; margin:0; }
+    .result-actions { display:flex; flex-wrap:wrap; gap:8px; padding-top:20px; }
+    .footnotes { margin:25px 0 28px; border:1px solid #2c3b51; border-radius:15px; padding:18px 23px; color:#a9bbd0; font-size:12px; }
+    .footnotes strong { color:#e7f1fa; }
+    .footnotes p { margin:5px 0; }
+    footer { padding:0 0 40px; display:flex; justify-content:space-between; gap:18px; flex-wrap:wrap; color:#8ca0b9; font-size:12px; }
+    code { font-family:Consolas,monospace; color:#d6f5ec; }
+    .for-print { display:none; }
+    @media (max-width:940px) { .layout { grid-template-columns:1fr; } .results { padding:23px 22px; } .form-content { padding:4px 22px 24px; } .phead { padding:22px 22px 16px; } }
+    @media (max-width:490px) { .shell { width:calc(100% - 24px); } .topbar { align-items:flex-start; padding-top:16px; } .head-tags { flex-direction:column; align-items:flex-end; gap:6px; } .intro { padding:25px 0 19px; } .field-grid { grid-template-columns:1fr; } .metrics { grid-template-columns:1fr 1fr; } .metric { padding:12px; } .metric strong { font-size:18px; } .bar-row { grid-template-columns:46px 1fr 87px; gap:8px; } .bar-label,.bar-val { font-size:11px; } }
+    @media print { :root { color-scheme:light; } body { color:#101827; background:#fff; } .shell { width:100%; padding:0 10px; } .panel,.metric,.footnotes,.takeaway { background:#fff!important; color:#101827!important; border-color:#b7c1cf!important; box-shadow:none!important; } .layout { grid-template-columns:1fr 1fr; gap:13px; } .form-content,.phead,.results { padding:14px; } .intro { padding:10px 0; } .intro p,.phead p,.field label,.helper,.subsection p,.metric small,.bar-label,.bar-val,.section-label,.big-caption,.footnotes,.takeaway p,.eyebrow { color:#374151!important; } .field input { color:#111827!important; background:#fff!important; border-color:#8896a7; } .results .big-number,.metric strong,.takeaway h3,.phead h2,.footnotes strong { color:#111827!important; } .tag,.status,.main-actions,.result-actions,.head-tags,.btn { display:none!important; } .footnotes { margin:12px 0; } .for-print { display:block; font-size:12px; } .bar-track { background:#dfe5ec!important; } .bar-fill { background:#8295b7!important; print-color-adjust:exact; -webkit-print-color-adjust:exact; } footer { color:#465164!important; padding:5px 0; } }
+  </style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">↗</span><span>CyberLoss</span></div>
+    <div class="head-tags"><span class="tag">KIB-47</span><span class="tag green">КТ4 / Рабочий прототип</span></div>
+  </header>
+  <section class="intro">
+    <div class="eyebrow">Кибербезопасность × экономика</div>
+    <h1>Сколько стоит остановка<br>интернет-магазина?</h1>
+    <p>Оцени финансовые последствия киберпростоя за минуту. Введи показатели тестового бизнеса, сравни длительность остановки и получи понятную оценку потерь без регистрации и передачи данных.</p>
+  </section>
+  <main class="layout">
+    <section class="panel" aria-labelledby="inputTitle">
+      <div class="phead"><div><h2 id="inputTitle">Параметры сценария</h2><p>Все значения можно изменить. Для демонстрации используются вымышленные данные.</p></div></div>
+      <div class="form-content">
+        <div class="fgroup" style="border-top:0;margin-top:0;padding-top:0">
+          <h3>Экономика интернет-магазина</h3>
+          <div class="field-grid">
+            <div class="field"><label for="dailyRevenue">Выручка в день</label><div class="inputwrap"><input id="dailyRevenue" inputmode="decimal" type="number" min="0" max="10000000000" step="1000" value="120000"><span class="suffix">₽</span></div><p class="helper">Средняя дневная выручка до инцидента.</p></div>
+            <div class="field"><label for="margin">Маржинальность</label><div class="inputwrap"><input id="margin" inputmode="decimal" type="number" min="0" max="100" step="1" value="30"><span class="suffix">%</span></div><p class="helper">Доля выручки, превращающаяся в маржинальный доход.</p></div>
+          </div>
+        </div>
+        <div class="fgroup">
+          <h3>Характер киберинцидента</h3>
+          <div class="field-grid">
+            <div class="field"><label for="downtimeHours">Продолжительность простоя</label><div class="inputwrap"><input id="downtimeHours" inputmode="decimal" type="number" min="0" max="720" step="1" value="48"><span class="suffix">ч</span></div><p class="helper">Время ограничения продаж.</p></div>
+            <div class="field"><label for="affectedPercent">Доля остановленных продаж</label><div class="inputwrap"><input id="affectedPercent" inputmode="decimal" type="number" min="0" max="100" step="1" value="100"><span class="suffix">%</span></div><p class="helper">100% означает полную остановку.</p></div>
+            <div class="field span"><label for="lostPercent">Доля заказов, которую не удастся вернуть после восстановления</label><div class="inputwrap"><input id="lostPercent" inputmode="decimal" type="number" min="0" max="100" step="1" value="80"><span class="suffix">%</span></div><p class="helper">Часть покупок может состояться позже. Это отдельное предположение, а не статистика.</p></div>
+          </div>
+        </div>
+        <div class="fgroup">
+          <h3>Прямые расходы</h3>
+          <div class="field-grid">
+            <div class="field"><label for="restoreCost">Восстановление систем</label><div class="inputwrap"><input id="restoreCost" inputmode="decimal" type="number" min="0" max="10000000000" step="1000" value="45000"><span class="suffix">₽</span></div></div>
+            <div class="field"><label for="responseCost">Реагирование на инцидент</label><div class="inputwrap"><input id="responseCost" inputmode="decimal" type="number" min="0" max="10000000000" step="1000" value="20000"><span class="suffix">₽</span></div></div>
+          </div>
+        </div>
+        <div id="validation" class="alert" role="alert"></div>
+        <div class="main-actions"><button type="button" id="calculateBtn" class="btn primary">Рассчитать ущерб →</button><button type="button" id="resetBtn" class="btn ghost">Тестовый пример</button></div>
+      </div>
+    </section>
+    <section class="panel" aria-labelledby="resultsTitle">
+      <div class="results">
+        <div class="summary-top"><span class="section-label" id="resultsTitle">Оценка финансовых последствий</span><span class="status" id="calcStatus" role="status">Расчёт выполнен</span></div>
+        <div id="totalLoss" class="big-number" aria-live="polite">122 600 ₽</div>
+        <div class="big-caption">Ориентировочный ущерб при указанных параметрах</div>
+        <div class="metrics">
+          <div class="metric"><small>Упущенный маржинальный доход</small><strong id="marginLoss" class="num-orange">57 600 ₽</strong></div>
+          <div class="metric"><small>Восстановление + реагирование</small><strong id="directCost" class="num-teal">65 000 ₽</strong></div>
+          <div class="metric"><small>Выручка под риском</small><strong id="revenueRisk">240 000 ₽</strong></div>
+          <div class="metric"><small>Безвозвратно потерянная выручка</small><strong id="irrecoverableRevenue">192 000 ₽</strong></div>
+        </div>
+        <div class="subsection"><h3>Если простой длится дольше</h3><p>Сравнение для 12, 24, 48 и 72 часов. Все прочие входные параметры одинаковы.</p><div id="scenarioBars" aria-label="Сравнение стоимости четырёх сценариев простоя"></div></div>
+        <div class="takeaway"><h3>Что показывает расчёт</h3><p id="takeaway">Уменьшение длительности простоя снижает потерю маржинального дохода. Заранее подготовленный план восстановления может помочь сократить последствия.</p></div>
+        <div class="result-actions"><button type="button" class="btn" id="copyBtn">Скопировать результат</button><button type="button" class="btn" id="printBtn">Распечатать / PDF</button></div>
+      </div>
+    </section>
+  </main>
+  <section class="footnotes"><strong>Как считается результат</strong><p>Выручка под риском = дневная выручка × часы простоя / 24 × доля остановленных продаж. Безвозвратно потерянная выручка = выручка под риском × доля невосстановленных заказов. Упущенный маржинальный доход = невосстановленная выручка × маржинальность. Итоговый ущерб = упущенный маржинальный доход + восстановление систем + реагирование.</p><p><strong>Ограничения:</strong> это упрощённая учебная сценарная модель, а не прогноз или страховая оценка. Не учитываются сезонность, зависимость заказов по времени суток, штрафы, отток клиентов, налоги, репутационные потери и другие косвенные последствия. Не вводите реальные конфиденциальные данные.</p><p><strong>Конфиденциальность:</strong> приложение работает локально в браузере. Данные никуда не отправляются, внешние сервисы не подключаются.</p></section>
+  <footer><span>Учебный проект KIB-47 · Капитан: Рогачев Максим Андреевич</span><span>CyberLoss MVP · 24.11.2026 · Версия 0.1</span></footer>
+</div>
+<script id="calculation-core">
+'use strict';
+// Core is kept separate from the UI so that scenarios and test cases use the same formula.
+function computeCyberLoss(input) {
+  const nums = ['dailyRevenue','margin','downtimeHours','affectedPercent','lostPercent','restoreCost','responseCost'];
+  const limits = {dailyRevenue:1e10,margin:100,downtimeHours:720,affectedPercent:100,lostPercent:100,restoreCost:1e10,responseCost:1e10};
+  for (const name of nums) {
+    const n=input[name];
+    if (typeof n !== 'number' || !Number.isFinite(n) || n<0 || n>limits[name]) throw new RangeError('Некорректное поле: '+name);
+  }
+  const revenueRisk=input.dailyRevenue*input.downtimeHours/24*input.affectedPercent/100;
+  const irrecoverableRevenue=revenueRisk*input.lostPercent/100;
+  const marginLoss=irrecoverableRevenue*input.margin/100;
+  const directCost=input.restoreCost+input.responseCost;
+  const totalLoss=marginLoss+directCost;
+  return {revenueRisk,irrecoverableRevenue,marginLoss,directCost,totalLoss};
+}
+</script>
+<script>
+'use strict';
+const fieldNames = ['dailyRevenue','margin','downtimeHours','affectedPercent','lostPercent','restoreCost','responseCost'];
+const demoValues = {dailyRevenue:120000,margin:30,downtimeHours:48,affectedPercent:100,lostPercent:80,restoreCost:45000,responseCost:20000};
+const rub = (n) => new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0}).format(Math.round(n))+' ₽';
+const num = (id) => document.getElementById(id);
+let latestInput=null,latestResult=null;
+function readInput() {
+  const obj = {};
+  const errors=[];
+  for (const id of fieldNames) {
+    const el=num(id);
+    const raw=el.value.trim();
+    const value=raw==='' ? Number.NaN : Number(raw);
+    obj[id]=value;
+    let valid=Number.isFinite(value) && raw!=='' && value>=Number(el.min) && value<=Number(el.max);
+    el.setAttribute('aria-invalid',String(!valid));
+    if(!valid) errors.push(el.closest('.field').querySelector('label').textContent);
+  }
+  if(errors.length) throw new Error('Проверь значения: '+errors.join(', ')+'. Используй неотрицательные числа в пределах, указанных в полях.');
+  return obj;
+}
+function drawBars(input) {
+  const hours=[12,24,48,72];
+  const points=hours.map(h=>({hour:h,loss:computeCyberLoss({...input,downtimeHours:h}).totalLoss}));
+  const max=Math.max(1,...points.map(x=>x.loss));
+  const parent=num('scenarioBars'); parent.replaceChildren();
+  for(const p of points) {
+    const row=document.createElement('div'); row.className='bar-row';
+    const left=document.createElement('span'); left.className='bar-label'; left.textContent=p.hour+' ч';
+    const track=document.createElement('div'); track.className='bar-track';
+    const bar=document.createElement('div'); bar.className='bar-fill'; bar.style.width=(100*p.loss/max).toFixed(2)+'%';
+    const right=document.createElement('span'); right.className='bar-val'; right.textContent=rub(p.loss);
+    track.appendChild(bar); row.append(left,track,right); parent.appendChild(row);
+  }
+}
+function renderResults(input, result) {
+  num('totalLoss').textContent=rub(result.totalLoss);
+  num('marginLoss').textContent=rub(result.marginLoss);
+  num('directCost').textContent=rub(result.directCost);
+  num('revenueRisk').textContent=rub(result.revenueRisk);
+  num('irrecoverableRevenue').textContent=rub(result.irrecoverableRevenue);
+  num('calcStatus').textContent='Расчёт выполнен';
+  num('validation').style.display='none';
+  if(input.downtimeHours===0) num('takeaway').textContent='При нулевом простое потери продаж равны нулю, но введённые прямые расходы остаются. Проверь допущения выбранного сценария.';
+  else if (result.marginLoss>result.directCost) num('takeaway').textContent='В этом сценарии главная часть ущерба связана с потерянными продажами. Сокращение времени простоя и подготовленный план восстановления помогут ограничить потери.';
+  else num('takeaway').textContent='В этом сценарии основная часть ущерба связана с прямыми затратами на восстановление и реагирование. Сокращение времени простоя уменьшит упущенный маржинальный доход, но не изменит заданные расходы.';
+  drawBars(input);
+  latestInput=input; latestResult=result;
+}
+function recalc() {
+  try { const input=readInput(); renderResults(input,computeCyberLoss(input)); return true; }
+  catch(err) { const el=num('validation'); el.textContent=err.message; el.style.display='block'; num('calcStatus').textContent='Исправь данные'; latestInput=null; latestResult=null; return false; }
+}
+function setDemo() { for(const id of fieldNames) num(id).value=String(demoValues[id]); recalc(); }
+function summaryText() {
+  if (!latestInput || !latestResult) return '';
+  const i=latestInput,r=latestResult;
+  return `CyberLoss - учебный расчёт KIB-47\nВыручка: ${rub(i.dailyRevenue)} / день\nМаржинальность: ${i.margin}%\nПростой: ${i.downtimeHours} ч\nОстановленные продажи: ${i.affectedPercent}%\nНевосстановленные заказы: ${i.lostPercent}%\nВыручка под риском: ${rub(r.revenueRisk)}\nНевосстановленная выручка: ${rub(r.irrecoverableRevenue)}\nУпущенный маржинальный доход: ${rub(r.marginLoss)}\nРасходы на восстановление и реагирование: ${rub(r.directCost)}\nИТОГО: ${rub(r.totalLoss)}\nУчебная модель на тестовых данных, не прогноз.`;
+}
+num('calculateBtn').addEventListener('click',recalc);
+num('resetBtn').addEventListener('click',setDemo);
+fieldNames.forEach(id=>num(id).addEventListener('input',recalc));
+num('printBtn').addEventListener('click',()=>{if(recalc()) window.print();});
+num('copyBtn').addEventListener('click',async()=>{
+  if(!recalc()) return;
+  const message=summaryText(); const btn=num('copyBtn');
+  try {
+    if(navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(message);
+    else { const ta=document.createElement('textarea'); ta.value=message; ta.style.position='fixed'; ta.style.left='-10000px'; document.body.appendChild(ta); ta.select(); if(!document.execCommand('copy')) throw new Error('copy unavailable'); ta.remove(); }
+    btn.textContent='Скопировано';
+  } catch(e) { btn.textContent='Копирование недоступно'; }
+  setTimeout(()=>btn.textContent='Скопировать результат',1800);
+});
+setDemo();
+</script>
+</body>
+</html>
